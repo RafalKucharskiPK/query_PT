@@ -1,6 +1,6 @@
 # Public Transport queries
 
-Query public transport connections for set of trip requests from origin to destination at given departure time. 
+Query public transport connections for set of trip requests (from origin to a destination at given departure time). 
 
 > This python library uses OpenTripPlanner to query single or multiple trips (origin, destination, departure time) for their detailed PT connection. 
 >
