@@ -24,6 +24,7 @@ Query public transport connections for set of trip requests from origin to desti
  * .csv file with requests 
  * .dbf file with OSM network (available e.g. [here](https://www.interline.io/osm/extracts/))
  * .zip with GTFS file for the area and date that we query (available e.g. from [transit.land](https://www.transit.land/)
+ * both OSM and GTFS file shall be stored in `data` folder
  
  ### Output:
  * .csv with trip details
