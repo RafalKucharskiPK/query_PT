@@ -2,7 +2,7 @@
 
 Query public transport connections for set of trip requests (from origin to a destination at given departure time). 
 
-> This python library uses OpenTripPlanner to query single or multiple trips (origin, destination, departure time) for their detailed PT connection. 
+> This python library uses OpenTripPlanner to query single or multiple trips (origin, destination, departure time) for their detailed PT routes. 
 >
 > It was succesfully applied to query 3 million trips from 6 different cities in one of our research projects.
 ---
@@ -34,7 +34,7 @@ Query public transport connections for set of trip requests (from origin to a de
  ### Usage:
  * single trips and visualization in this tutorial [notebook](tutorial.ipynb)
  * running the OTP server [notebook](run_OTP_server.ipynb)
- * bulk queries: `python main.py`
+ * bulk queries (up to millions of requests): `python main.py`
  
  
  -----
