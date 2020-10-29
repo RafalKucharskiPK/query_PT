@@ -12,13 +12,13 @@ Query public transport connections for set of trip requests from origin to desti
  ### Output:
  * .csv with trip details
  
- ![vis](data/vis.png)
+ ![vis](vis.png)
  
  fig.1 Sample query in Amsterdam
- ![vis](data/in.png)
+ ![vis](in.png)
  
  fig. 2 Input
- ![vis](data/out.png)
+ ![vis](out.png)
  
  fig.3 Output
  
