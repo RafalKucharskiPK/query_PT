@@ -7,24 +7,24 @@ Query public transport connections for set of trip requests (from origin to a de
 > It was succesfully applied to query 3 million trips from 6 different cities in one of our research projects.
 ---
 
+fig.1 Sample query in Amsterdam
+
 ![vis](data/vis.png)
- 
- fig.1 Sample query in Amsterdam
- 
- ![vis](data/in.png)
  
  fig. 2 Input
  
- ![vis](data/out.png)
+ ![vis](data/in.png)
  
  fig.3 Output
-
-
+ 
+ ![vis](data/out.png)
+ 
+ ---
 
 ### Input:
  * .csv file with requests 
  * .dbf file with OSM network (available e.g. [here](https://www.interline.io/osm/extracts/))
- * .zip with GTFS file for the area and date that we query (available e.g. from [transit.land](https://www.transit.land/)
+ * .zip with GTFS file for the area and date that we query (available e.g. from [transit.land](https://www.transit.land/))
  * both OSM and GTFS file shall be stored in `data` folder
  
  ### Output:
