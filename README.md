@@ -15,9 +15,11 @@ Query public transport connections for set of trip requests from origin to desti
  ![vis](vis.png)
  
  fig.1 Sample query in Amsterdam
+ 
  ![vis](in.png)
  
  fig. 2 Input
+ 
  ![vis](out.png)
  
  fig.3 Output
