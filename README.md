@@ -12,7 +12,18 @@ Query public transport connections for set of trip requests from origin to desti
  ### Output:
  * .csv with trip details
  
+ ![vis](data/vis.png)
+ 
+ fig.1 Sample query in Amsterdam
+ ![vis](data/in.png)
+ 
+ fig. 2 Input
+ ![vis](data/out.png)
+ 
+ fig.3 Output
+ 
  ### Usage:
- * single trips and visualization: this jupyter
+ * single trips and visualization in this tutorial [notebook](tutorial.ipynb)
+ * running the OTP server [notebook](run_OTP_server.ipynb)
  * bulk queries: `python main.py`
  

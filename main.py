@@ -4,19 +4,19 @@ import subprocess
 import requests
 import pandas as pd
 from time import sleep
-import glob
-import signal
-from shutil import copyfile
-import random
-
 
 #PARAMS
-SLEEP_SINGLE = 0.1
-SLEEP_BATCH = 10
-SLEEP_RESTART = 60
-BATCH_SIZE = 5000  # store results every batch_size trips and give a break to a server
-RESTART_EVERY = 30
+from utils import get_latest, merge_batches
+
+SLEEP_SINGLE = 0.1  # pause between queries so that we do not flood server
+SLEEP_BATCH = 10 # sleep between batches of requests, not to floog server
+SLEEP_RESTART = 60 # sleep after restarting the server (if needed)
+BATCH_SIZE = 50  # store results every batch_size trips and give a break to a server
+RESTART_EVERY = 30 # restart after every batch
+
+OTP_API = '"http://localhost:8080/otp/routers/default/plan"'
 QUERY_MODES = "TRANSIT,WALK"
+MAX_WALK_DISTANCE = 2000
 
 
 
@@ -38,7 +38,7 @@ def make_query(row):
     query['date'] = "{}-{}-{}".format(row.treq.month, row.treq.day, row.treq.year)
 
     query['mode'] = QUERY_MODES
-    query['maxWalkDistance'] = 2000
+    query['maxWalkDistance'] = MAX_WALK_DISTANCE
     query['arriveBy'] = 'false'
     return query
 
@@ -80,40 +80,6 @@ def parse_OTP_response(response):
     return ret
 
 
-def get_latest(path):
-    """
-    returns the id of the last succesffully queried requests
-    useful to warm restart after server is down
-    :param path:
-    :return:
-    """
-    try:
-        df = pd.read_csv(path, index_col=[0])  # load the csv
-        return int(df[df.success].index.max() - 1)  # last one with success
-    except:
-        return 0
-
-
-def test_server(dataset_path):
-    batch_df = pd.read_csv(dataset_path, index_col=[0]).sample(5)  # load the csv
-    queries = batch_df.apply(make_query, axis=1)  # make OTP query for each trip in dataset
-    print('test server on 5 sample trips')
-
-    ret_dict = list()
-    for id, query in queries.iteritems():
-        try:
-            r = requests.get("http://localhost:8080/otp/routers/default/plan", params=query)
-            ret = parse_OTP_response(r.json())
-            print(query, ret)
-        except Exception as err:
-            print(f"Exception occured: {err}")
-            ret = {'success': False}
-            pass
-        ret['id'] = id
-        print(id, ret['success'])
-        ret_dict.append(ret)
-
-
 def query_dataset(PATH, OUTPATH, BATCHES_PATH = None):
     df = pd.read_csv(PATH, index_col=[0]).sort_index()  # load the csv
     df.treq = pd.to_datetime(df.treq)
@@ -126,12 +92,13 @@ def query_dataset(PATH, OUTPATH, BATCHES_PATH = None):
     # loop over batches
     for batch in range((max(BATCH_SIZE, df.shape[0]) // BATCH_SIZE)):
         batch_df = df.iloc[BATCH_SIZE * batch:BATCH_SIZE * (batch + 1)]  # process this batch only
+        print(BATCH_SIZE * batch,BATCH_SIZE * (batch + 1))
         queries = batch_df.apply(make_query, axis=1)  # make OTP query for each trip in dataset
 
         ret_list = list()
         for id, query in queries.iteritems():
             try:
-                r = requests.get("http://localhost:8080/otp/routers/default/plan", params=query)
+                r = requests.get(OTP_API, params=query)
                 ret = parse_OTP_response(r.json())
             except Exception as err:
                 print(f"Exception occured: {err}")
@@ -158,23 +125,6 @@ def query_dataset(PATH, OUTPATH, BATCHES_PATH = None):
             print("scheduled server restart")
             return -1
     return 1
-
-
-def merge_batches(path, out_path, remove=True):
-    """
-    walks through directory and merges all csv files into one
-    :param path:
-    :param out_path:
-    :param remove:
-    :return: none
-    """
-
-    all_files = glob.glob(path + "/*.csv")
-    df = pd.concat((pd.read_csv(f) for f in all_files), sort=False).set_index('id')
-    df.to_csv(os.path.join(out_path))
-    if remove:
-        for f in all_files:
-            os.remove(f)
 
 
 def main(start_server = True):
@@ -214,22 +164,27 @@ def main(start_server = True):
     merge_batches(path=BATCHES_PATH, out_path=OUTPATH, remove=False)
 
 
+
+def test_server(dataset_path):
+    batch_df = pd.read_csv(dataset_path, index_col=[0]).sample(5)  # load the csv
+    queries = batch_df.apply(make_query, axis=1)  # make OTP query for each trip in dataset
+    print('test server on 5 sample trips')
+
+    ret_dict = list()
+    for id, query in queries.iteritems():
+        try:
+            r = requests.get(OTP_API, params=query)
+            ret = parse_OTP_response(r.json())
+            print(query, ret)
+        except Exception as err:
+            print(f"Exception occured: {err}")
+            ret = {'success': False}
+            pass
+        ret['id'] = id
+        print(id, ret['success'])
+        ret_dict.append(ret)
+
+
 if __name__ == "__main__":
     main(start_server=False)
-    # for CITY in ['Warsaw', 'Amsterdam', 'Houston', 'NYC', 'Stockholm', 'DC', 'DC_BUS']:
-    #     if CITY == 'DC_BUS':
-    #         QUERY_MODES = 'BUS,WALK'
-    #     else:
-    #         QUERY_MODES = "TRANSIT,WALK"
-    #
-    #     print('\n\n========= {} =========\n\n'.format(CITY))
-    #     main(CITY='Warsaw')
-    # for CITY in ['Stockholm']:
-    #    print('========= {} ========='.format(CITY))
-    # CITY = 'DC'
-    # test_me(CITY = CITY)
-    # main(CITY= CITY)
-    # QUERY_MODES = 'BUS,WALK'
-    # CITY = 'DC_BUS'
-    # main(CITY = CITY)
-    # test_restart(CITY = 'Warsaw')
+

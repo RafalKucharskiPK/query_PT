@@ -1,3 +1,6 @@
+import glob
+import os
+
 import requests
 import folium
 from shapely.geometry import Point
@@ -48,3 +51,36 @@ def plot(plan, color='green'):
         folium.CircleMarker(marker, radius=5, color=color, opacity=0.7).add_to(map_osm)
     map_osm.add_child(points)
     return map_osm
+
+
+def get_latest(path):
+    """
+    returns the id of the last succesffully queried requests
+    useful to warm restart after server is down
+    :param path:
+    :return:
+    """
+    try:
+        df = pd.read_csv(path, index_col=[0])  # load the csv
+        return int(df[df.success].index.max()+1)  # last one with success
+    except:
+        return 0
+
+
+
+
+def merge_batches(path, out_path, remove=True):
+    """
+    walks through directory and merges all csv files into one
+    :param path:
+    :param out_path:
+    :param remove:
+    :return: none
+    """
+
+    all_files = glob.glob(path + "/*.csv")
+    df = pd.concat((pd.read_csv(f) for f in all_files), sort=False).set_index('id')
+    df.to_csv(os.path.join(out_path))
+    if remove:
+        for f in all_files:
+            os.remove(f)
