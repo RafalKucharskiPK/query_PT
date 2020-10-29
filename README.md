@@ -5,16 +5,17 @@ Query public transport connections for set of trip requests from origin to desti
 > This python library uses OpenTripPlanner to query single or multiple trips (origin, destination, departure time) for their detailed PT connection. 
 >
 > It was succesfully applied to query 3 million trips from 6 cities in the research project.
+---
 
-![vis](vis.png)
+![vis](data/vis.png)
  
  fig.1 Sample query in Amsterdam
  
- ![vis](in.png)
+ ![vis](data/in.png)
  
  fig. 2 Input
  
- ![vis](out.png)
+ ![vis](data/out.png)
  
  fig.3 Output
 
